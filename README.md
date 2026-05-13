@@ -104,7 +104,8 @@ python=3.9.25
 pip install torch torchvision nltk pandas numpy
 ```
 
-``` Folder Structure
+Folder Structure:
+```
 ├── main.py
 ├── model/
 │     ├──  encoder.py
