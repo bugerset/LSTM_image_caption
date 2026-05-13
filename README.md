@@ -1,4 +1,4 @@
-LSTM Image Captioning with PyTorch
+# LSTM Image Captioning with PyTorch
 
 > Image Captioning is a great project for studying the Encoder-Decoder structure — so I built an LSTM-based captioning model trained on the Flickr8k Datase
 
