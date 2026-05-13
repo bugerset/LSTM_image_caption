@@ -1,119 +1,89 @@
-# LSTM_image_caption with Pytorch
+LSTM Image Captioning with PyTorch
 
+> Image Captioning is a great project for studying the Encoder-Decoder structure — so I built an LSTM-based captioning model trained on the Flickr8k Datase
 
-I think Image Caption project is good for study Encoder-Decoder Structure.
-
-
-So, I made LSTM Image Caption train code with `Flickr8k Dataset`.
+---
 
 # What is Image Caption?
 
-Image Caption is a computer vision and natural language processing task that automatically generates a descriptive, human-readable sentence for an input image.
+Image Caption is a **Computer Vision** and **Natural Language Processing** task that automatically generates a human-readable sentence describing an input image.
 
-If you giva a image to model, then model creates description of Image.
+If you give an image to model, then model creates description of Image.
 
 For example,
 | Input Image | Description(Example) |
 |-------------|----------------------|
 |<img width="772" height="512" alt="스크린샷 2026-05-13 오후 9 37 46" src="https://github.com/user-attachments/assets/3279dfba-fca8-436c-9dfb-f20fd499397f" />|A white dog with a green collar is lying on the floor.|
 
-# How it works? (Structure)
+# How it works? - Architecture Overview
 
-First, Pre-trained MobileNet_V3 extract the feature-map of image.
+**Encoder (MobileNetV3)**
+A pre-trained MobileNet_V3 acts as the feature extractor. CNNs are well known for capturing visual features through convolution operations.
 
-
-Known as well, Convolution extract the feature of image.
-
+In a standard classification pipeline, features pass through a fully-connected layer and a Softmax to produce class probabilities. Here, we strip everything after the final Linear layer and instead feed those features directly into the Decoder.
 
 <img width="944" height="397" alt="스크린샷 2026-05-13 오후 9 55 09" src="https://github.com/user-attachments/assets/2ebf1c10-b9f4-446e-b0ff-b55df43b5a6a" />
 
+**Decoder (LSTM)**
 
-Originally, features pass through a soft-max and then argmaxed value is predicted to output in Classification.
+Before diving into LSTM, it helps to understand RNN (Recurrent Neural Network).
 
-우리는 다른거 다 필요없이, 이미지를 추출하는 Convolution과 Softmax로 향하기 위한 마지막 Linear 부분만 살려둘 것이다.
-
-
-그렇게 나온 결과들은 Softmax로 향하는것이 아니라, going to Decoder that constructed with LSTM.
-
-
-LSTM에 대해서 알아보기 전에, RNN이라는 순환 구조를 알아야한다.
-
+RNNs are designed to process sequential data. Just as humans predict the next word based on prior context, RNNs maintain a hidden state that carries information from previous time steps — giving the model a form of memory.
 
 <img width="885" height="329" alt="스크린샷 2026-05-13 오후 10 08 18" src="https://github.com/user-attachments/assets/44d94cdf-f0bb-4528-8be5-bf7eaa796107" />
 
-RNN은 연속적인 시퀸스를 처리하기 위한 신경망이다.
+However, RNNs suffer from the vanishing gradient problem: as sequences grow longer, earlier information gradually fades due to the limits of the hyperbolic tangent activation.
 
-사람은 글을 읽을 때, 이전 단어들에 대한 이해를 바탕으로 다음 단어를 예측한다. 이를 모방한 구조라고 볼 수 있다.
+LSTM (Long Short-Term Memory) addresses this by introducing a Cell State, which acts as a long-term memory lane and significantly reduces information loss over long sequences.
 
-RNN은 시점에 따라서 입력을 받는데, 중간에 있는 Hidden이 연산을 위해서 직전 시점의 Hidden을 입력받는다.
+---
 
-이러한 점이 RNN이 정보를 기억하고 있는 비결이다.
+# Generating Captions - Training vs Inference
 
-하지만 RNN은 시점이 길어지면 길어질수록, 앞에 있던 정보가 소실되는 문제가 있다. (RNN에서 사용되는 Hyper-bolic tangent의 한계로 인해서)
+**Training : Teacher Forcing**
 
-이런 문제를 어느정도 해결할 수 있는 방법이 바로 LSTM(Long-Short Term Memory)이다.
+A naive approach would be to feed each predicted word back as input for the next step. While this works, it is extremely slow to train.
 
-LSTM은 Cell-State를 사용하여, RNN에 비해서 시점이 길어져도, 앞에 있던 정보의 손실이 덜 생긴다는 장점이 있다.
-
-지금까지 나온 내용으로는 Encoder에서 특징을 추출하고, LSTM에 넣어서 을 배웠다.
-
-그런데 문장을 생성하는 과정이 어떻게 이루어질까?
-
-# About generates caption
-
-우선 학습에서 단어 예측은 어떤 방식일까?
-
-학습은 Loss를 줄이기 위해서 실제 이미지 캡션 == 예측 이미지 캡션이 되도록 해야한다.
-
-현명하게 생각해보자. 특징이 주어졌을때, 예측 단어를 하나 뱉는 경우에 그 예측 단어를 다시 입력으로 넣어서 학습을 하면 Caption을 잘 만들어낼 것이다.
-
-하지만 학습의 속도가 매우매우 느려지는 결과가 생긴다.
-
-그래서 Teacher Forcing이라는 방식을 사용하여, 모델이 빠르게 학습한다.
+Instead, we use Teacher Forcing: rather than using the model's own predictions as inputs, we feed the ground-truth words at each time step. This dramatically speeds up convergence.
 
 <img width="215" height="192" alt="스크린샷 2026-05-13 오후 10 26 02" src="https://github.com/user-attachments/assets/ff82d257-1f71-48ff-9621-f2ad0ab328bf" />
-Caption이 "What will the cat sit on"인 경우에, 다음 단어가 어떤것이 나와야 올바른 것인지를 학습한다.
 
-이런 이유로 Teacher Forcing이라고 불린다.
+But during inference, Teacher Forcing is disabled — instead, each predicted word is fed back as the next input, allowing the model to generate captions autoregressively.
 
-테스트 과정에서는 결과의 정확도를 높이기 위해 Teacher Forcing 없이, 예측 단어를 입력으로 넣어서 올바른 Caption이 잘 생성되도록 해준다.
+Although this may look complex at first, walking through the code in the model/caption file makes it fairly straightforward to follow.
+
 <img width="224" height="195" alt="스크린샷 2026-05-13 오후 10 27 29" src="https://github.com/user-attachments/assets/6364b76c-3e22-4ffe-aded-97ad63e5ade8" />
 
-엄청 복잡하지만, model폴더에 있는 코드들을 보면서 이해하면 그다지 어렵지 않을 것이다.
+That said, I noticed the model's predictions weren't particularly great with plain greedy decoding — so I implemented Beam Search to improve caption quality.
 
-그런데 모델의 예측 결과가 썩 좋지 않은 결과를 내는 것을 발견했다.
+## What is Beam-Search?
 
-그래서 Beam-Search를 통해 문장을 생성하도록 만들었다.
+You can see Beam Search applied in the inference function inside caption.py.
 
-# What is Beam-Search?
-caption.py에 있는 inference를 보면 Beam-Search가 적용된 모습이다.
+Previously, the decoder selected the single highest-probability word at every time step — this is called Greedy Decoding. 
 
-기존에는 디코더가 매 시점마다 가장 높은 확률을 가지는 단어를 선택하도록 하였다. (Greedy Decoding)
+The problem is that as the sentence grows longer, an earlier word choice that seemed optimal may turn out to be suboptimal, and there is no way to undo that decision once it's made.
 
-그러나 문장이 이어지면 이어질수록 이전에 골랐던 단어가 최적의 선택을 내지 못할 수 있고, 순간 잘못된 선택을 내리게 되어도 결정을 취소할 수 없다.
+Beam Search addresses this weakness by keeping the top-k candidate words at each step and discarding the rest.
 
-Beam-Search는 이런 단점을 보완하기 위해 만들어진 알고리즘으로, 확률이 가장 높은 단어 k개를 후보로 선택하고 나머지 단어는 제거한다.
+For example, with k = 3:
 
-예를 들면 다음과 같은 방식이다.
-
-(k가 3이라면)
 In Greedy Decoding => ["I"]
+
 In Beam-Search => ["I", "Am", "The"]
 
-여기서 I, Am, The 각각에 대해서 다음 단어를 예측하고 예측 단어들중 가장 확률이 높은 k개의 후보군을 다시 남긴다.
+From each of these candidates — "I", "Am", "The" — the model predicts the next word, then again retains only the top-k highest-scoring sequences. 
 
-이런식으로 계속 문장을 만들어서 가장 확률이 높은 문장을 선택하는 것이 Beam-Search이다.
+This process repeats until the sentence is complete, and the sequence with the highest overall probability is selected as the final caption.
 
-
-
-## Recommended Python Environment and Folder Structure
+# Environment & Setup
 I run this code in:
-``` Environment
+```
 python=3.9.25
 pip install torch torchvision nltk pandas numpy
 ```
 
-Folder Structure:
+# Folder Structure:
 ```
 ├── main.py
 ├── model/
@@ -134,7 +104,7 @@ Folder Structure:
 └── lstm_caption.pth
 ```
 
-## CLI argparse
+# CLI argparse
 
 Key arguments (from `utils/parser.py`):
 ```
@@ -158,5 +128,125 @@ Key arguments (from `utils/parser.py`):
     • --load_model (default = False)
     • --save_model (default = True)
 ```
+
+## Expected Output
+
+# LSTM Image Captioning with PyTorch
+
+> Image Captioning is a great project for studying the **Encoder-Decoder** structure — so I built an LSTM-based captioning model trained on the **Flickr8k Dataset**.
+
+---
+
+## What is Image Captioning?
+
+Image Captioning is a task at the intersection of **Computer Vision** and **Natural Language Processing** that automatically generates a human-readable sentence describing an input image.
+
+| Input Image | Generated Caption (Example) |
+|---|---|
+| 🐶 | *"A white dog with a green collar is lying on the floor."* |
+
+---
+
+## How It Works — Architecture Overview
+
+### Encoder (MobileNetV3)
+
+A pre-trained **MobileNet_V3** acts as the feature extractor. CNNs are well known for capturing visual features through convolution operations.
+
+In a standard classification pipeline, features pass through a fully-connected layer and a Softmax to produce class probabilities. Here, we strip everything after the final Linear layer and instead **feed those features directly into the Decoder**.
+
+### Decoder (LSTM)
+
+Before diving into LSTM, it helps to understand **RNN (Recurrent Neural Network)**.
+
+RNNs are designed to process sequential data. Just as humans predict the next word based on prior context, RNNs maintain a hidden state that carries information from previous time steps — giving the model a form of memory.
+
+However, RNNs suffer from the **vanishing gradient problem**: as sequences grow longer, earlier information gradually fades due to the limits of the hyperbolic tangent activation.
+
+**LSTM (Long Short-Term Memory)** addresses this by introducing a **Cell State**, which acts as a long-term memory lane and significantly reduces information loss over long sequences.
+
+---
+
+## Generating Captions — Training vs. Inference
+
+### Training: Teacher Forcing
+
+A naive approach would be to feed each predicted word back as input for the next step. While this works, it is **extremely slow to train**.
+
+Instead, we use **Teacher Forcing**: rather than using the model's own predictions as inputs, we feed the **ground-truth words** at each time step. This dramatically speeds up convergence.
+
+```
+Caption: "What will the cat sit on"
+Input  : [<SOS>, "What", "will", "the", "cat", "sit"]
+Target : ["What", "will", "the", "cat", "sit", "on"]
+```
+
+### Inference: Beam Search
+
+At test time, Teacher Forcing is removed and the model generates words autoregressively (each predicted word becomes the next input).
+
+The naive approach — always picking the single highest-probability word — is called **Greedy Decoding**. A wrong early choice can derail the entire sentence with no way to backtrack.
+
+**Beam Search** improves this by maintaining the **top-k candidates** at every step:
+
+```
+k = 3, first step:
+Greedy → ["I"]
+Beam   → ["I", "Am", "The"]
+```
+
+Each candidate is then expanded, and only the top-k scoring sequences are kept. The final caption is chosen as the sequence with the highest cumulative probability.
+
+---
+
+## Environment & Setup
+
+```bash
+python=3.9.25
+pip install torch torchvision nltk pandas numpy
+```
+
+### Folder Structure
+
+```
+├── main.py
+├── model/
+│     ├── encoder.py
+│     ├── decoder.py
+│     └── caption.py
+├── get_data/
+│     └── load_data.py
+├── utils/
+│     ├── valid.py
+│     ├── parser.py
+│     ├── device.py
+│     └── seed.py
+├── Images/
+├── captions.txt
+├── dog.jpg
+├── horse.jpg
+└── lstm_caption.pth
+```
+
+---
+
+## CLI Arguments
+
+| Category | Argument | Default | Description |
+|---|---|---|---|
+| **Model** | `--embed_size` | 256 | Embedding dimension |
+| | `--hidden_size` | 256 | LSTM hidden size |
+| | `--num_layers` | 1 | Number of LSTM layers |
+| **Training** | `--lr` | 0.0005 | Learning rate |
+| | `--epoch` | 100 | Number of epochs |
+| | `--batch_size` | 128 | Batch size |
+| | `--threshold` | 3 | Minimum word frequency for vocabulary (lower = larger vocab) |
+| **Data** | `--img_path` | — | Path to image folder |
+| | `--txt_path` | — | Path to captions file |
+| **Misc** | `--seed` | 845 | Random seed |
+| | `--load_model` | False | Load saved checkpoint |
+| | `--save_model` | True | Save model after training |
+
+---
 
 ## Expected Output
