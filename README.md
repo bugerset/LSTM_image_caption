@@ -18,9 +18,14 @@ For example,
 # How it works? - Architecture Overview
 
 **Encoder (MobileNetV3)**
-A pre-trained MobileNet_V3 acts as the feature extractor. CNNs are well known for capturing visual features through convolution operations.
 
-In a standard classification pipeline, features pass through a fully-connected layer and a Softmax to produce class probabilities. Here, we strip everything after the final Linear layer and instead feed those features directly into the Decoder.
+A pre-trained MobileNet_V3 acts as the feature extractor. 
+
+CNNs are well known for capturing visual features through convolution operations.
+
+In a standard classification pipeline, features pass through a fully-connected layer and a Softmax to produce class probabilities. 
+
+Here, we strip everything after the final Linear layer and instead feed those features directly into the Decoder.
 
 <img width="944" height="397" alt="스크린샷 2026-05-13 오후 9 55 09" src="https://github.com/user-attachments/assets/2ebf1c10-b9f4-446e-b0ff-b55df43b5a6a" />
 
@@ -131,7 +136,3 @@ Key arguments (from `utils/parser.py`):
 
 # Expected Output
 
-
----
-
-## Expected Output
