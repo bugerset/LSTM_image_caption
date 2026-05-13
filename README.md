@@ -35,7 +35,7 @@ Before diving into LSTM, it helps to understand RNN (Recurrent Neural Network).
 
 RNNs are designed to process sequential data. Just as humans predict the next word based on prior context, RNNs maintain a hidden state that carries information from previous time steps — giving the model a form of memory.
 
-<img width="885" height="329" alt="스크린샷 2026-05-13 오후 10 08 18" src="https://github.com/user-attachments/assets/44d94cdf-f0bb-4528-8be5-bf7eaa796107" />
+| <img width="885" height="329" alt="스크린샷 2026-05-13 오후 10 08 18" src="https://github.com/user-attachments/assets/44d94cdf-f0bb-4528-8be5-bf7eaa796107" /> |
 
 However, RNNs suffer from the vanishing gradient problem: as sequences grow longer, earlier information gradually fades due to the limits of the hyperbolic tangent activation.
 
