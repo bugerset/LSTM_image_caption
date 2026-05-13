@@ -67,11 +67,23 @@ LSTM은 Cell-State를 사용하여, RNN에 비해서 시점이 길어져도, 앞
 
 현명하게 생각해보자. 특징이 주어졌을때, 예측 단어를 하나 뱉는 경우에 그 예측 단어를 다시 입력으로 넣어서 학습을 하면 Caption을 잘 만들어낼 것이다.
 
-하지만 신경망은 생각보다 엄격하다.
+하지만 학습의 속도가 매우매우 느려지는 결과가 생긴다.
 
-위와 같은 방식으로 학습을 시키는 경우에는 생각보다 모델의 정확도가 떨어질 뿐만 아니라, 모델이 엉뚱한 결과를 학습하는 문제가 생길 수 있다.
+그래서 Teacher Forcing이라는 방식을 사용하여, 모델이 빠르게 학습한다.
 
+<img width="215" height="192" alt="스크린샷 2026-05-13 오후 10 26 02" src="https://github.com/user-attachments/assets/ff82d257-1f71-48ff-9621-f2ad0ab328bf" />
+Caption이 "What will the cat sit on"인 경우에, 다음 단어가 어떤것이 나와야 올바른 것인지를 학습한다.
 
+이런 이유로 Teacher Forcing이라고 불린다.
+
+테스트 과정에서는 결과의 정확도를 높이기 위해 Teacher Forcing 없이, 예측 단어를 입력으로 넣어서 올바른 Caption이 잘 생성되도록 해준다.
+<img width="224" height="195" alt="스크린샷 2026-05-13 오후 10 27 29" src="https://github.com/user-attachments/assets/6364b76c-3e22-4ffe-aded-97ad63e5ade8" />
+
+엄청 복잡하지만, model폴더에 있는 코드들을 보면서 이해하면 그다지 어렵지 않을 것이다.
+
+그런데 모델의 예측 결과가 썩 좋지 않은 결과를 내는 것을 발견했다.
+
+그래서 Beam-Search를 통해 문장을 생성하도록 만들었다.
 
 
 
@@ -83,11 +95,16 @@ LSTM은 Cell-State를 사용하여, RNN에 비해서 시점이 길어져도, 앞
 # What is Beam-Search?
 
 
-
-
 ## Recommended Folder Structure
 
+## Recommended Python Environment and Folder Structure
+I run this code in:
+``` Environment
+python=3.9.25
+pip install torch torchvision nltk pandas numpy
 ```
+
+``` Folder Structure
 ├── main.py
 ├── model/
 │     ├──  encoder.py
@@ -111,18 +128,20 @@ LSTM은 Cell-State를 사용하여, RNN에 비해서 시점이 길어져도, 앞
 
 Key arguments (from `utils/parser.py`):
 ```
-  • Reproducibility
-    • --seed (default: 845)
+  • Model Setting
+    • --embed_size (default = 256)
+    • --hidden_size (default = 256)
+    • --num_layers (default = 1)
 
-  • Mode
-    • --train-mode / --no-train-mode (default: True)
-    • --test-mode / --no-test-mode (default: True)
-    • --consistency / --no-consistency (default: True)
-        └── fixes same samples for reconstruction comparison across epochs
+  • Train
+    • --lr (default = 0.0005)
+    • --epoch (default = 100)
+    • --batch_size (default = 128)
+    • --threshold (default = 3) <--- (I use Count based Vocab, so if you want more larger vocab, then low that)
 
-  • Dataset
-    • --data-set (default: mnist, choices: [mnist, cifar10, cifar100])
-    • --root (default: ./data)
+  • Data
+    • --img_path
+    • --txt_path
 
   • VAE
     • --latent-vector (default: 20)
@@ -141,3 +160,5 @@ Key arguments (from `utils/parser.py`):
 ```
 
 ## Expected Output
+
+## Recommended Folder Structure
