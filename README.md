@@ -122,7 +122,7 @@ Key arguments (from `utils/parser.py`):
     • --lr (default = 0.0005)
     • --epoch (default = 100)
     • --batch_size (default = 128)
-    • --threshold (default = 3) <--- (I use Count based Vocab, so if you want more larger vocab, then low that)
+    • --threshold (default = 3) <-- (Lower = large vocab, Higher = small vocab)
 
   • Data
     • --img_path
@@ -130,8 +130,8 @@ Key arguments (from `utils/parser.py`):
 
   • Else
     • --seed (default = 845)
-    • --load_model (default = False)
-    • --save_model (default = True)
+    • --load_model (default = False) <-- (if you declare this, then load pth)
+    • --save_model (default = True) <-- (if you declare this, then save pth)
 ```
 
 # Expected Output
