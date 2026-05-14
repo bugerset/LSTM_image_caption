@@ -135,7 +135,7 @@ Key arguments (from `utils/parser.py`):
   • Else
     • --seed (default = 845)
     • --load_model (default = False) <-- (if you declare this, then load pth)
-    • --save_model (default = True) <-- (if you declare this, then save pth)
+    • --save_model (default = True) <-- (if you declare this, then not save pth)
 ```
 
 # Expected Output (with 85 epoch trained weights)
