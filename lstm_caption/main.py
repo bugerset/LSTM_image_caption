@@ -55,7 +55,7 @@ def main():
 
     if args.load_model:
         print("Loading Pre-trained model...")
-        model.load_state_dict(torch.load("/Users/youngseo/Desktop/lstm_caption85.pth"))
+        model.load_state_dict(torch.load("lstm_caption.pth"))
 
     model.train()
 
