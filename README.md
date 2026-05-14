@@ -2,7 +2,7 @@
 
 > Image Captioning is a great project for studying the Encoder-Decoder structure — so I built an LSTM-based captioning model trained on the Flickr8k Datase
 
-You can download Flickr8k Dataset in this link
+You can download Flickr8k Dataset in this link:
 
 https://www.kaggle.com/datasets/adityajn105/flickr8k
 
