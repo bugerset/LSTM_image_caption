@@ -1,3 +1,4 @@
+<img width="375" height="497" alt="스크린샷 2026-05-14 오후 12 32 48" src="https://github.com/user-attachments/assets/295e13cf-2f5b-4c87-90cc-b4bfd1122e49" />
 # LSTM Image Captioning with PyTorch
 
 > Image Captioning is a great project for studying the Encoder-Decoder structure — so I built an LSTM-based captioning model trained on the Flickr8k Datase
@@ -139,4 +140,9 @@ Key arguments (from `utils/parser.py`):
 ```
 
 # Expected Output
+|------------------------------------------------|
+| A woman with a pink boa walks down a sidewalk. |
+| <img width="375" height="497" alt="스크린샷 2026-05-14 오후 12 32 48" src="https://github.com/user-attachments/assets/96e93d1e-0152-42a0-8680-b58e18385a81" /> |
+
+
 
