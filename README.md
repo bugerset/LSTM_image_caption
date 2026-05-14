@@ -138,10 +138,23 @@ Key arguments (from `utils/parser.py`):
     • --save_model (default = True) <-- (if you declare this, then save pth)
 ```
 
-# Expected Output
-| A woman with a pink boa walks down a sidewalk. |
-|------------------------------------------------|
-| <img width="375" height="497" alt="스크린샷 2026-05-14 오후 12 32 48" src="https://github.com/user-attachments/assets/96e93d1e-0152-42a0-8680-b58e18385a81" /> |
+# Expected Output (with 85 epoch trained weights)
+
+<img width="375" height="497" alt="스크린샷 2026-05-14 오후 12 32 48" src="https://github.com/user-attachments/assets/96e93d1e-0152-42a0-8680-b58e18385a81" />
+True : A woman with a pink boa walks down a sidewalk .
+Pred : a woman with a backpack walks down the sidewalk .
+
+---
+<img width="498" height="400" alt="스크린샷 2026-05-14 오후 12 37 28" src="https://github.com/user-attachments/assets/aa0d2f38-6d4d-4504-9291-4f9ffd7d457d" />
+True : A grey and white dog is biting the ear of a white and brown dog .
+Pred : two dogs bite each other in the grass .
+
+---
+<img width="595" height="397" alt="스크린샷 2026-05-14 오후 12 39 23" src="https://github.com/user-attachments/assets/c0e35bbc-b027-4926-b1c0-bbf0b42e1a6f" />
+True : A woman in a white top is riding a brown horse across a green field under a cloudy sky.
+Pred : a woman and a dog are walking through a grassy area .
+
+
 
 
 
